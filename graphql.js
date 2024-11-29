@@ -211,7 +211,7 @@ module.exports = function(RED) {
       }
       var variables = msg[node.varsField] || {}
 
-      callGraphQLServer(query, variables, node.customHeaders);
+      callGraphQLServer(query, {...variables}, node.customHeaders);
     });
 
     node.on("close", function() {
