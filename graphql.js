@@ -3,7 +3,7 @@ module.exports = function(RED) {
   var axios = require("axios");
   var mustache = require("mustache");
 
-  var vers = "2.2.4";
+  var vers = "2.2.5";
 
   function isReadable(value) {
     return typeof value === 'object' && typeof value._read === 'function' && typeof value._readableState === 'object'
@@ -119,82 +119,81 @@ module.exports = function(RED) {
       return data
     }
 
-    function callGraphQLServer(query, variables = {}, customHeaders = {}) {
+    async function callGraphQLServer(query, variables = {}, customHeaders = {}) {
       let data = dataobject(node.context(), node.msg);
       let url = mustache.render(node.graphqlConfig.endpoint, data);
-      let headers = customHeaders
+      let headers = customHeaders;
       const token = node.token || node.graphqlConfig.token || "";
+    
       if (token) {
-        headers["Authorization"] = `Bearer ${token}`
+        headers["Authorization"] = `Bearer ${token}`;
       }
-
+    
       if (node.showDebug) {
         node.log(safeJSONStringify(data));
         node.log(headers.Authorization);
       }
-
-      axios({
-        method: "POST",
-        url,
-        headers,
-        timeout: 20000,
-        data: {
-          query: query,
-          variables: variables
-        }
-      })
-        .then(function(response) {
-          if (!node.msg.payload) node.msg.payload = {};
-          switch (true) {
-            case response.status == 200 && !response.data.errors:
-              node.status({
-                fill: "green",
-                shape: "dot",
-                text: RED._("graphql.status.success")
-              });
-              node.msg.payload.graphql = response.data.data; // remove .data to see entire response
-              if (node.showDebug){
-                node.msg.debugInfo = {
-                  data: response.data,
-                  headers,
-                  query,
-                  variables
-                }
-              }
-              node.send(node.msg);
-              break;
-            case response.status == 200 && !!response.data.errors:
-              node.status({
-                fill: "yellow",
-                shape: "dot",
-                text: RED._("graphql.status.gqlError")
-              });
-              node.msg.payload.graphql = response.data.errors;
-              node.send([null, node.msg]);
-              break;
-            default:
-              node.status({
-                fill: "red",
-                shape: "dot",
-                text: "status: " + response.status
-              });
-              node.msg.payload.graphql = {
-                statusCode: response.status,
-                body: response.data
-              };
-              node.send([null, node.msg]);
-              break;
+    
+      try {
+        const response = await axios({
+          method: "POST",
+          url,
+          headers,
+          timeout: 20000,
+          data: {
+            query: query,
+            variables: variables
           }
-        })
-        .catch(function(error) {
-          RED.log.debug("error:" + error);
-          node.status({ fill: "red", shape: "dot", text: "error" });
-          if (!node.msg.payload) node.msg.payload = {};
-          node.msg.payload.graphql = { error };
-          node.error("error: " + error);
-          node.send([null, node.msg]);
         });
+    
+        if (!node.msg.payload) node.msg.payload = {};
+    
+        if (response.status === 200 && !response.data.errors) {
+          node.status({
+            fill: "green",
+            shape: "dot",
+            text: RED._("graphql.status.success")
+          });
+          node.msg.payload.graphql = response.data.data; // remove .data to see entire response
+          if (node.showDebug) {
+            node.msg.debugInfo = {
+              data: response.data,
+              headers,
+              query,
+              variables
+            };
+          }
+          node.send(node.msg);
+        } else if (response.status === 200 && response.data.errors) {
+          node.status({
+            fill: "yellow",
+            shape: "dot",
+            text: RED._("graphql.status.gqlError")
+          });
+          node.msg.payload.graphql = response.data.errors;
+          node.send([null, node.msg]);
+        } else {
+          node.status({
+            fill: "red",
+            shape: "dot",
+            text: "status: " + response.status
+          });
+          node.msg.payload.graphql = {
+            statusCode: response.status,
+            body: response.data
+          };
+          node.send([null, node.msg]);
+        }
+      } catch (error) {
+        RED.log.debug("error:" + error);
+        node.status({ fill: "red", shape: "dot", text: "error" });
+        if (!node.msg.payload) node.msg.payload = {};
+        node.msg.payload.graphql = { error };
+        node.error("error: " + error);
+        node.send([null, node.msg]);
+      }
     }
+    
 
     node.on("input", function(msg) {
       RED.log.debug("--- on(input) ---");
