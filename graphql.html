@@ -1,4 +1,4 @@
-<script type="text/x-red" data-template-name="graphql-server">
+<script type="text/x-red" data-template-name="graphql-server-silvertrek">
     <div class="form-row">
         <label for="node-config-input-name"><i class="fa fa-tag"></i> <span data-i18n="node-red:common.label.name"></span></label>
         <input type="text" id="node-config-input-name" data-i18n="[placeholder]node-red:common.label.name">
@@ -14,7 +14,7 @@
 </script>
 
 <script type="text/javascript">
-    RED.nodes.registerType('graphql-server', {
+    RED.nodes.registerType('graphql-server-silvertrek', {
         category: 'config',
         color: "rgb(218, 196, 180)",
         defaults: {
@@ -82,12 +82,12 @@
 
 <script type="text/javascript">
 
-    RED.nodes.registerType('graphql', {
+    RED.nodes.registerType('graphql-silvertrek', {
         category: 'function',
         color: '#a6bbcf',
         defaults: {
             name: { value: "", required: true },
-            graphql: { type: "graphql-server", required: true },
+            graphql: { type: "graphql-server-silvertrek", required: true },
             format: { value: "handlebars", required: false },
             template: { value: "{\n  country(code: \"NL\") {\n    name\n    native\n    capital\n  }\n}", required: true },
             syntax: { value: "mustache", required: false },

@@ -87,7 +87,7 @@
     },
     {
         "id": "4a27e34566452125",
-        "type": "graphql-server",
+        "type": "graphql-server-silvertrek",
         "name": "GitHub",
         "endpoint": "https://api.github.com/graphql",
         "token": ""

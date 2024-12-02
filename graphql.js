@@ -77,7 +77,7 @@ module.exports = function(RED) {
     RED.log.debug("node.token: " + node.token)
   }
 
-  RED.nodes.registerType("graphql-server", GraphqlNode, {
+  RED.nodes.registerType("graphql-server-silvertrek", GraphqlNode, {
     credentials: {
       token: { type: "password" },
     }

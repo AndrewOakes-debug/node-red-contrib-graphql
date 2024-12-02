@@ -26,9 +26,9 @@ A NodeRed node to execute GraphQL Queries.
 
 ## GraphQL Nodes
 
-Provides a `GraphQL` node to support queries and a configuration node called `graphql-server`.
+Provides a `GraphQL` node to support queries and a configuration node called `graphql-server-silvertrek`.
 
-### `graphql-server` Configuration Node Fields
+### `graphql-server-silvertrek` Configuration Node Fields
 
 | Name     | Use                 |
 | -------- | ------------------- |
@@ -75,7 +75,7 @@ A bearer token can be provided for authentication. This is an example using the 
 
 ### Config Node Token
 
-If you have an token with a long life, you can provide the token in the `graphql-server` configuration node. For GitHub, user your GitHub PAT.
+If you have an token with a long life, you can provide the token in the `graphql-server-silvertrek` configuration node. For GitHub, user your GitHub PAT.
 
 ![Github Config](images/githubGraphqlConfig.png)
 

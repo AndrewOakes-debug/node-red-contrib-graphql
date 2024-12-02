@@ -103,7 +103,7 @@
     },
     {
         "id": "5ec8b7409ad68ba9",
-        "type": "graphql-server",
+        "type": "graphql-server-silvertrek",
         "name": "Countries",
         "endpoint": "https://countries.trevorblades.com"
     }
