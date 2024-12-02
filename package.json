@@ -22,7 +22,7 @@
   "node-red": {
     "version": ">=2",
     "nodes": {
-      "graphql": "graphql.js"
+      "graphql-silvertrek": "graphql.js"
     }
   },
   "author": {
