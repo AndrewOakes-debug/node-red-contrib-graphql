@@ -224,7 +224,7 @@ module.exports = function(RED) {
     });
   }
 
-  RED.nodes.registerType("graphql", GraphqlExecNode, {
+  RED.nodes.registerType("graphql-silvertrek", GraphqlExecNode, {
     credentials: {
       token: { type: "password" },
     }
