@@ -3,7 +3,7 @@ module.exports = function(RED) {
   var axios = require("axios");
   var mustache = require("mustache");
 
-  var vers = "2.2.6";
+  var vers = "2.2.7";
 
   function isReadable(value) {
     return typeof value === 'object' && typeof value._read === 'function' && typeof value._readableState === 'object'
@@ -133,6 +133,8 @@ module.exports = function(RED) {
         node.log(headers.Authorization);
       }
 
+      let nodeMsg = {...node.msg}
+
       axios({
         method: "POST",
         url,
@@ -144,7 +146,7 @@ module.exports = function(RED) {
         }
       })
         .then(function(response) {
-          if (!node.msg.payload) node.msg.payload = {};
+          if (!nodeMsg.payload) nodeMsg.payload = {};
           switch (true) {
             case response.status == 200 && !response.data.errors:
               node.status({
@@ -152,16 +154,16 @@ module.exports = function(RED) {
                 shape: "dot",
                 text: RED._("graphql.status.success")
               });
-              node.msg.payload.graphql = response.data.data; // remove .data to see entire response
+              nodeMsg.payload.graphql = response.data.data; // remove .data to see entire response
               if (node.showDebug){
-                node.msg.debugInfo = {
+                nodeMsg.debugInfo = {
                   data: response.data,
                   headers,
                   query,
                   variables
                 }
               }
-              node.send(node.msg);
+              node.send({ ...nodeMsg } );
               break;
             case response.status == 200 && !!response.data.errors:
               node.status({
@@ -169,8 +171,8 @@ module.exports = function(RED) {
                 shape: "dot",
                 text: RED._("graphql.status.gqlError")
               });
-              node.msg.payload.graphql = response.data.errors;
-              node.send([null, node.msg]);
+              nodeMsg.payload.graphql = response.data.errors;
+              node.send([null, nodeMsg]);
               break;
             default:
               node.status({
@@ -178,21 +180,21 @@ module.exports = function(RED) {
                 shape: "dot",
                 text: "status: " + response.status
               });
-              node.msg.payload.graphql = {
+              nodeMsg.payload.graphql = {
                 statusCode: response.status,
                 body: response.data
               };
-              node.send([null, node.msg]);
+              node.send([null, nodeMsg]);
               break;
           }
         })
         .catch(function(error) {
           RED.log.debug("error:" + error);
           node.status({ fill: "red", shape: "dot", text: "error" });
-          if (!node.msg.payload) node.msg.payload = {};
-          node.msg.payload.graphql = { error };
+          if (!nodeMsg.payload) nodeMsg.payload = {};
+          nodeMsg.payload.graphql = { error };
           node.error("error: " + error);
-          node.send([null, node.msg]);
+          node.send([null, nodeMsg]);
         });
     }
 
